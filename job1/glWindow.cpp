@@ -50,6 +50,29 @@ void glWindow::setLightPosition(int index, float lightPosition[4]) {
 	glLightfv(GL_LIGHT0 + index, GL_POSITION, lightPosition);
 }
 
+void glWindow::drawText(std::string text) {
+	glDisable(GL_LIGHTING);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	gluOrtho2D(0, 500, 0, 500);
+
+	glRasterPos2i(10, 10);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*) text.c_str());
+
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
+}
+
 void glWindow::onDraw() {
 	// just clean screen and do nothing.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

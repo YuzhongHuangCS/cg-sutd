@@ -1,6 +1,9 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include "PotWindow.h"
+#include <cmath>
+
+#define PI 3.14159265358979323846
 
 PotWindow::PotWindow(int argc, char** argv):
 	glWindow(argc, argv)
@@ -23,24 +26,29 @@ void PotWindow::create(int width, int height, std::string title) {
 }
 
 void PotWindow::onDraw() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	if(target == 0){
 		drawPot();
 	} else{
 		drawFile();
 	}
-}
 
-void PotWindow::drawPot(){
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	setViewPoint(viewPoint);
-	glutSolidTeapot(1.0);
-	
+	if(!statusText.empty()) {
+		drawText(statusText);
+		statusText.clear();
+	}
+
 	glutSwapBuffers();
 }
 
+void PotWindow::drawPot(){
+	setViewPoint(viewPoint);
+	glutSolidTeapot(1.0);
+}
+
 void PotWindow::readFile(std::string fileName) {
-	std::ifstream inFile;
+	std::ifstream inFile(fileName);
 	std::string line;
 	std::vector<std::string> words;
 	std::vector<float> nums;
@@ -50,10 +58,9 @@ void PotWindow::readFile(std::string fileName) {
 	normal.clear();
 	face.clear();
 
-	try{
-		inFile.open(fileName);
-	} catch(std::ios_base::failure& ex) {
-		std::cerr << "Exception occurred: " << ex.what() << std::endl;
+	if(!inFile.is_open()) {
+		statusText = "Unable to open file " + fileName;
+		std::cerr << statusText << std::endl;
 		return;
 	}
 
@@ -93,7 +100,6 @@ void PotWindow::readFile(std::string fileName) {
 }
 
 void PotWindow::drawFile() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	setViewPoint(viewPoint);
 
 	for(auto it = face.begin(); it != face.end(); it++){
@@ -107,8 +113,6 @@ void PotWindow::drawFile() {
 			glVertex3f(vertex[item[6]][0], vertex[item[6]][1], vertex[item[6]][2]);
 		glEnd();
 	}
-
-	glutSwapBuffers();
 }
 
 void PotWindow::onKeyPress(unsigned char key, int x, int y) {
@@ -126,6 +130,12 @@ void PotWindow::onKeyPress(unsigned char key, int x, int y) {
 			if(target != 0){
 				readFile(objFileList[target-1]);
 			}
+			break;
+		case 's':
+			//spinning = !spinning;
+			//if(spinning){
+			spin();
+			//}
 			break;
 	}
 
@@ -150,4 +160,14 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 
 	setLightPosition(0, lightPosition);
 	glutPostRedisplay();
+}
+
+void PotWindow::spin(int id){
+	angle += PI/60;
+
+	viewPoint[0][0] = distance * sin(angle);
+	viewPoint[0][2] = distance * cos(angle);
+
+	glutPostRedisplay();
+	//glutTimerFunc(100, this->spin, 1);
 }

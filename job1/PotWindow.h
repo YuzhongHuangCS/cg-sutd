@@ -18,6 +18,7 @@ class PotWindow : public glWindow {
 		void readFile(std::string fileName);
 		void drawPot();
 		void drawFile();
+		void spin(int id = 0);
 
 	private:
 		int target = 0;
@@ -43,6 +44,11 @@ class PotWindow : public glWindow {
 		std::vector< std::vector<float> > vertex;
 		std::vector< std::vector<float> > normal;
 		std::vector< std::vector<int> > face;
+
+		std::string statusText;
+		bool spinning = false;
+		int distance = 5;
+		float angle = 0;
 };
 
 #endif // _POT_WINDOW_H_
