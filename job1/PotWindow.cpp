@@ -99,12 +99,12 @@ void PotWindow::drawFile() {
 	for(auto it = face.begin(); it != face.end(); it++){
 		std::vector<int> item = *it;
 		glBegin(GL_TRIANGLES);
-			glNormal3d(normal[item[2]][0], normal[item[2]][1], normal[item[2]][2]);
-			glVertex3d(vertex[item[0]][0], vertex[item[0]][1], vertex[item[0]][2]);
-			glNormal3d(normal[item[5]][0], normal[item[5]][1], normal[item[5]][2]);
-			glVertex3d(vertex[item[3]][0], vertex[item[3]][1], vertex[item[3]][2]);
-			glNormal3d(normal[item[8]][0], normal[item[8]][1], normal[item[8]][2]);
-			glVertex3d(vertex[item[6]][0], vertex[item[6]][1], vertex[item[6]][2]);
+			glNormal3f(normal[item[2]][0], normal[item[2]][1], normal[item[2]][2]);
+			glVertex3f(vertex[item[0]][0], vertex[item[0]][1], vertex[item[0]][2]);
+			glNormal3f(normal[item[5]][0], normal[item[5]][1], normal[item[5]][2]);
+			glVertex3f(vertex[item[3]][0], vertex[item[3]][1], vertex[item[3]][2]);
+			glNormal3f(normal[item[8]][0], normal[item[8]][1], normal[item[8]][2]);
+			glVertex3f(vertex[item[6]][0], vertex[item[6]][1], vertex[item[6]][2]);
 		glEnd();
 	}
 

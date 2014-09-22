@@ -9,7 +9,6 @@ void onSpecialKeyPressWrapper(int key, int x, int y);
 
 int main(int argc, char *argv[]) {
 	PotWindow window(argc, argv);
-
 	window.create(500, 500, "SolidTeapot");
 
 	windowPointer = &window;
