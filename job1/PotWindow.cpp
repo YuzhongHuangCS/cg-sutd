@@ -8,8 +8,10 @@ void onDrawWrapper();
 void onReshapreWrapper(int width, int height);
 void onKeyPressWrapper(unsigned char key, int x, int y);
 void onSpecialKeyPressWrapper(int key, int x, int y);
-void spinWarpper(int id);
-void transColorWarpper(int id);
+void spinWrapper(int id);
+void transColorWrapper(int id);
+void onClickWrapper(int button, int state, int x, int y);
+void onMotionWrapper(int x, int y);
 
 PotWindow::PotWindow(int argc, char** argv):
 	glWindow(argc, argv)
@@ -34,6 +36,8 @@ void PotWindow::create(int width, int height, std::string title) {
 	glutReshapeFunc(::onReshapreWrapper);
 	glutKeyboardFunc(::onKeyPressWrapper);
     glutSpecialFunc(::onSpecialKeyPressWrapper);
+    glutMouseFunc(::onClickWrapper);
+    glutMotionFunc(::onMotionWrapper);
 
     glutMainLoop();
 }
@@ -42,7 +46,8 @@ void PotWindow::onDraw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	setViewPoint(viewPoint);
 
-	glRotatef(angle, 0, 1, 0);
+	glRotatef(angleX, 1, 0, 0);
+	glRotatef(angleY, 0, 1, 0);
 
 	if(displayListMap[target] == -1){
 		if(target == 0){
@@ -193,10 +198,10 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 }
 
 void PotWindow::spin(int id) {
-	angle += 5;
+	angleY += 5;
 	glutPostRedisplay();
 	if(spinning){
-		glutTimerFunc(40, spinWarpper, 1);
+		glutTimerFunc(40, spinWrapper, 1);
 	}
 }
 
@@ -212,7 +217,50 @@ void PotWindow::transColor(int id) {
 	glutPostRedisplay();
 	
 	if(id < 10){
-		glutTimerFunc(25, transColorWarpper, ++id);
+		glutTimerFunc(25, transColorWrapper, ++id);
+	}
+}
+
+void PotWindow::onClick(int button, int state, int x, int y){
+	buttonID = button;
+	buttonState = state;
+	if(state == 1){
+		if(buttonID == 0){
+			angleXOffset = angleXOffset + float(y-buttonY) / 10;
+			angleYOffset = angleYOffset + float(x-buttonX) / 10;
+		}
+		if(buttonID == 1){
+			xOffset += float((buttonX-x)) / 100;
+			yOffset += float((y-buttonY)) / 100;
+		}
+		if(buttonID == 2){
+			fOffset += float((buttonX-x) + (buttonY-y)) / 30;
+		}
+	}
+	buttonX = x;
+	buttonY = y;
+}
+
+void PotWindow::onMotion(int x, int y){
+	if(buttonID == 0){
+		// note that x and y used in screen and coordinate is different
+		angleX = angleXOffset + float(y-buttonY) / 10;
+		angleY = angleYOffset + float(x-buttonX) / 10;
+		glutPostRedisplay();
+	}
+	if(buttonID == 1){
+		viewPoint[0][0] = xOffset + float((buttonX-x)) / 100;
+		viewPoint[1][0] = xOffset + float((buttonX-x)) / 100;
+		viewPoint[0][1] = yOffset + float((y-buttonY)) / 100;
+		viewPoint[1][1] = yOffset + float((y-buttonY)) / 100;
+		glutPostRedisplay();
+	}
+	if(buttonID == 2){
+		fovy = fOffset + float((buttonX-x) + (buttonY-y)) / 30;
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(fovy, 1.0, 1.0, 100.0);
+		glutPostRedisplay();
 	}
 }
 
@@ -232,10 +280,18 @@ void onSpecialKeyPressWrapper(int key, int x, int y){
 	windowPointer->onSpecialKeyPress(key, x, y);
 }
 
-void spinWarpper(int id) {
+void spinWrapper(int id) {
 	windowPointer->spin(id);
 }
 
-void transColorWarpper(int id) {
+void transColorWrapper(int id) {
 	windowPointer->transColor(id);
+}
+
+void onClickWrapper(int button, int state, int x, int y) {
+	windowPointer->onClick(button, state, x, y);
+}
+
+void onMotionWrapper(int x, int y) {
+	windowPointer->onMotion(x, y);
 }

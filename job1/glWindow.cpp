@@ -61,7 +61,7 @@ void glWindow::drawText(std::string text) {
 	glPushMatrix();
 	glLoadIdentity();
 
-	gluOrtho2D(0, 500, 0, 500);
+	gluOrtho2D(0, width, 0, height);
 
 	glRasterPos2i(10, 10);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*) text.c_str());
@@ -80,18 +80,19 @@ void glWindow::onDraw() {
 }
 
 void glWindow::onReshape(int width, int height) {
-	// Always use the largest square viewport possible
+	this->width = width;
+	this->height = height;
 	
 	if (width > height) {
-		glViewport((width - height) / 2, 0, height, height);
-	} else {
 		glViewport(0, (height - width) / 2, width, width);
+	} else {
+		glViewport((width - height) / 2, 0, height, height);
 	}
 
 	// Set up a perspective view, with square aspect ratio
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	// 50 degree fov, uniform aspect ratio, near = 1, far = 100
-	gluPerspective(50.0, 1.0, 1.0, 100.0);
+	gluPerspective(fovy, 1.0, 1.0, 100.0);
 	glutSwapBuffers();
 }

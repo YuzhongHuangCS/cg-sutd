@@ -26,6 +26,9 @@ class glWindow {
 		virtual void onReshape(int width, int height);
 
 	protected:
+		int width;
+		int height;
+		float fovy = 50;
 
 	private:
 

@@ -13,6 +13,8 @@ class PotWindow : public glWindow {
 		virtual void onDraw();
 		virtual void onKeyPress(unsigned char key, int x, int y);
 		virtual void onSpecialKeyPress(int key, int x, int y);
+		virtual void onClick(int button, int state, int x, int y);
+		virtual void onMotion(int x, int y);
 
 		void spin(int id = 0);
 		void transColor(int id = 0);
@@ -31,6 +33,7 @@ class PotWindow : public glWindow {
 			{0.0, 0.0, 0.0},
 			{0.0, 1.0, 0.0}
 		};
+
 		float diffColors[4][4] = {
 			{0.5, 0.5, 0.9, 1.0},
 			{0.9, 0.5, 0.5, 1.0},
@@ -49,10 +52,22 @@ class PotWindow : public glWindow {
 
 		std::string statusText;
 		bool spinning = false;
-		float angle = 5;
+		float angleX = 0;
+		float angleY = 0;
 
 		int displayListMap[4] = {-1, -1, -1, -1};
 		int transRange[2] = {0, 0};
+
+		int buttonID;
+		int buttonState;
+		int buttonX;
+		int buttonY;
+
+		float angleXOffset = angleX;
+		float angleYOffset = angleY;
+		float xOffset = viewPoint[0][0];
+		float yOffset = viewPoint[0][1];
+		float fOffset = fovy;
 };
 
 #endif // _POT_WINDOW_H_
