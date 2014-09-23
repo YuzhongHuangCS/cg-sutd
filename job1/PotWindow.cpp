@@ -9,6 +9,7 @@ void onReshapreWrapper(int width, int height);
 void onKeyPressWrapper(unsigned char key, int x, int y);
 void onSpecialKeyPressWrapper(int key, int x, int y);
 void spinWarpper(int id);
+void transColorWarpper(int id);
 
 PotWindow::PotWindow(int argc, char** argv):
 	glWindow(argc, argv)
@@ -150,8 +151,9 @@ void PotWindow::onKeyPress(unsigned char key, int x, int y) {
 			exit(0);
 			break;
 		case 'c':
-			diffColorIndex = (diffColorIndex + 1) % 4;
-			setMaterialDiffuse(diffColors[diffColorIndex]);
+			transRange[0] = diffColorIndex;
+			transRange[1] = diffColorIndex = (diffColorIndex + 1) % 4;
+			transColor(0);
 			break;
 		case 'l':
 			target = (target + 1) % 4;
@@ -190,9 +192,7 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
-const static float pi = 3.14159265358979323846;
-
-void PotWindow::spin(int id){
+void PotWindow::spin(int id) {
 	angle += 5;
 	glutPostRedisplay();
 	if(spinning){
@@ -200,8 +200,20 @@ void PotWindow::spin(int id){
 	}
 }
 
-void spinWarpper(int id) {
-	windowPointer->spin(id);
+void PotWindow::transColor(int id) {
+	float currentColor[4] = {
+		diffColors[transRange[0]][0] + (diffColors[transRange[1]][0] - diffColors[transRange[0]][0]) / 10 * id,
+		diffColors[transRange[0]][1] + (diffColors[transRange[1]][1] - diffColors[transRange[0]][1]) / 10 * id,
+		diffColors[transRange[0]][2] + (diffColors[transRange[1]][2] - diffColors[transRange[0]][2]) / 10 * id,
+		diffColors[transRange[0]][3] + (diffColors[transRange[1]][3] - diffColors[transRange[0]][3]) / 10 * id
+	};
+
+	setMaterialDiffuse(currentColor);
+	glutPostRedisplay();
+	
+	if(id < 10){
+		glutTimerFunc(25, transColorWarpper, ++id);
+	}
 }
 
 void onDrawWrapper(){
@@ -218,4 +230,12 @@ void onKeyPressWrapper(unsigned char key, int x, int y){
 
 void onSpecialKeyPressWrapper(int key, int x, int y){
 	windowPointer->onSpecialKeyPress(key, x, y);
+}
+
+void spinWarpper(int id) {
+	windowPointer->spin(id);
+}
+
+void transColorWarpper(int id) {
+	windowPointer->transColor(id);
 }

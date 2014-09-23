@@ -15,6 +15,7 @@ class PotWindow : public glWindow {
 		virtual void onSpecialKeyPress(int key, int x, int y);
 
 		void spin(int id = 0);
+		void transColor(int id = 0);
 
 	protected:
 		void readFile(std::string fileName);
@@ -51,6 +52,7 @@ class PotWindow : public glWindow {
 		float angle = 5;
 
 		int displayListMap[4] = {-1, -1, -1, -1};
+		int transRange[2] = {0, 0};
 };
 
 #endif // _POT_WINDOW_H_
