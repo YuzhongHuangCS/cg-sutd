@@ -43,10 +43,14 @@ void PotWindow::onDraw() {
 
 	glRotatef(angle, 0, 1, 0);
 
-	if(target == 0){
-		drawPot();
+	if(displayListMap[target] == -1){
+		if(target == 0){
+			compilePot();
+		} else{
+			compileFile();
+		}
 	} else{
-		drawFile();
+		glCallList(displayListMap[target]);
 	}
 
 	if(!statusText.empty()) {
@@ -57,8 +61,14 @@ void PotWindow::onDraw() {
 	glutSwapBuffers();
 }
 
-void PotWindow::drawPot(){
-	glutSolidTeapot(1.0);
+void PotWindow::compilePot(){
+	int listID = glGenLists(1);
+	
+	glNewList(listID, GL_COMPILE_AND_EXECUTE);
+		glutSolidTeapot(1.0);
+	glEndList();
+
+	displayListMap[0] = listID;
 }
 
 void PotWindow::readFile(std::string fileName) {
@@ -113,7 +123,10 @@ void PotWindow::readFile(std::string fileName) {
 	}
 }
 
-void PotWindow::drawFile() {
+void PotWindow::compileFile() {
+	int listID = glGenLists(1);
+	glNewList(listID, GL_COMPILE_AND_EXECUTE);
+	
 	for(auto it = face.begin(); it != face.end(); it++){
 		std::vector<int> item = *it;
 		glBegin(GL_TRIANGLES);
@@ -125,6 +138,9 @@ void PotWindow::drawFile() {
 			glVertex3f(vertex[item[6]][0], vertex[item[6]][1], vertex[item[6]][2]);
 		glEnd();
 	}
+	
+	glEndList();
+	displayListMap[target] = listID;
 }
 
 void PotWindow::onKeyPress(unsigned char key, int x, int y) {
@@ -139,7 +155,7 @@ void PotWindow::onKeyPress(unsigned char key, int x, int y) {
 			break;
 		case 'l':
 			target = (target + 1) % 4;
-			if(target != 0){
+			if((target != 0) && (displayListMap[target] == -1)){
 				readFile(objFileList[target-1]);
 			}
 			break;

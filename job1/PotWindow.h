@@ -18,8 +18,8 @@ class PotWindow : public glWindow {
 
 	protected:
 		void readFile(std::string fileName);
-		void drawPot();
-		void drawFile();
+		void compilePot();
+		void compileFile();
 
 	private:
 		int target = 0;
@@ -49,6 +49,8 @@ class PotWindow : public glWindow {
 		std::string statusText;
 		bool spinning = false;
 		float angle = 5;
+
+		int displayListMap[4] = {-1, -1, -1, -1};
 };
 
 #endif // _POT_WINDOW_H_
