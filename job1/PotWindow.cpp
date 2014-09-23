@@ -3,6 +3,14 @@
 #include "PotWindow.h"
 #include <cmath>
 
+extern PotWindow* windowPointer;
+
+void onDrawWrapper();
+void onReshapreWrapper(int width, int height);
+void onKeyPressWrapper(unsigned char key, int x, int y);
+void onSpecialKeyPressWrapper(int key, int x, int y);
+void spinWarpper(int id);
+
 PotWindow::PotWindow(int argc, char** argv):
 	glWindow(argc, argv)
 {
@@ -21,6 +29,13 @@ void PotWindow::create(int width, int height, std::string title) {
 	setMaterialDiffuse(diffColors[diffColorIndex]);
 	setMaterialSpecular(specColor);
 	setMaterialShininess(shininess);
+
+	glutDisplayFunc(::onDrawWrapper);
+	glutReshapeFunc(::onReshapreWrapper);
+	glutKeyboardFunc(::onKeyPressWrapper);
+    glutSpecialFunc(::onSpecialKeyPressWrapper);
+
+    glutMainLoop();
 }
 
 void PotWindow::onDraw() {
@@ -160,12 +175,7 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
-extern PotWindow* windowPointer;
 const static float pi = 3.14159265358979323846;
-
-void spinWarpper(int id) {
-	windowPointer->spin(id);
-}
 
 void PotWindow::spin(int id){
 	angle += ::pi/120;
@@ -177,4 +187,24 @@ void PotWindow::spin(int id){
 	if(spinning){
 		glutTimerFunc(40, spinWarpper, 1);
 	}
+}
+
+void spinWarpper(int id) {
+	windowPointer->spin(id);
+}
+
+void onDrawWrapper(){
+	windowPointer->onDraw();
+}
+
+void onReshapreWrapper(int width, int height){
+	windowPointer->onReshape(width, height);
+}
+
+void onKeyPressWrapper(unsigned char key, int x, int y){
+	windowPointer->onKeyPress(key, x, y);
+}
+
+void onSpecialKeyPressWrapper(int key, int x, int y){
+	windowPointer->onSpecialKeyPress(key, x, y);
 }
