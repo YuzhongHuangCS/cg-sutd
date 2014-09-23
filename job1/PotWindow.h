@@ -19,6 +19,10 @@ class PotWindow : public glWindow {
 		void spin(int id = 0);
 		void transColor(int id = 0);
 
+		const static int dollyRate = 30;
+		const static int trackRate = 150;
+		const static int tumbleRate = 10;
+
 	protected:
 		void readDir();
 		void readFile(std::string fileName);

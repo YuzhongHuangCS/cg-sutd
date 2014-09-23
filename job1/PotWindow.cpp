@@ -238,15 +238,15 @@ void PotWindow::onClick(int button, int state, int x, int y){
 	buttonState = state;
 	if(state == GLUT_UP){
 		if(buttonID == GLUT_LEFT_BUTTON){
-			angleXOffset = angleXOffset + float(y-buttonY) / 10;
-			angleYOffset = angleYOffset + float(x-buttonX) / 10;
+			fOffset += float((buttonX-x) + (buttonY-y)) / dollyRate;
 		}
 		if(buttonID == GLUT_MIDDLE_BUTTON){
-			xOffset += float((buttonX-x)) / 150;
-			yOffset += float((y-buttonY)) / 150;
+			xOffset += float((buttonX-x)) / trackRate;
+			yOffset += float((y-buttonY)) / trackRate;
 		}
 		if(buttonID == GLUT_RIGHT_BUTTON){
-			fOffset += float((buttonX-x) + (buttonY-y)) / 30;
+			angleXOffset = angleXOffset + float(y-buttonY) / tumbleRate;
+			angleYOffset = angleYOffset + float(x-buttonX) / tumbleRate;
 		}
 	}
 	buttonX = x;
@@ -255,23 +255,24 @@ void PotWindow::onClick(int button, int state, int x, int y){
 
 void PotWindow::onMotion(int x, int y){
 	if(buttonID == GLUT_LEFT_BUTTON){
-		// Note that x and y used in screen and coordinate is different
-		angleX = angleXOffset + float(y-buttonY) / 10;
-		angleY = angleYOffset + float(x-buttonX) / 10;
-		glutPostRedisplay();
-	}
-	if(buttonID == GLUT_MIDDLE_BUTTON){
-		viewPoint[0][0] = xOffset + float((buttonX-x)) / 150;
-		viewPoint[1][0] = xOffset + float((buttonX-x)) / 150;
-		viewPoint[0][1] = yOffset + float((y-buttonY)) / 150;
-		viewPoint[1][1] = yOffset + float((y-buttonY)) / 150;
-		glutPostRedisplay();
-	}
-	if(buttonID == GLUT_RIGHT_BUTTON){
-		fovy = fOffset + float((buttonX-x) + (buttonY-y)) / 30;
+		fovy = fOffset + float((buttonX-x) + (buttonY-y)) / dollyRate;
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		gluPerspective(fovy, 1.0, 1.0, 100.0);
+		glutPostRedisplay();
+	}
+	if(buttonID == GLUT_MIDDLE_BUTTON){
+		viewPoint[0][0] = xOffset + float((buttonX-x)) / trackRate;
+		viewPoint[1][0] = xOffset + float((buttonX-x)) / trackRate;
+		viewPoint[0][1] = yOffset + float((y-buttonY)) / trackRate;
+		viewPoint[1][1] = yOffset + float((y-buttonY)) / trackRate;
+		glutPostRedisplay();
+	}
+
+	if(buttonID == GLUT_RIGHT_BUTTON){
+		// Note that x and y used in screen and coordinate is different
+		angleX = angleXOffset + float(y-buttonY) / tumbleRate;
+		angleY = angleYOffset + float(x-buttonX) / tumbleRate;
 		glutPostRedisplay();
 	}
 }
