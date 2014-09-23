@@ -1,7 +1,6 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include "PotWindow.h"
-#include <cmath>
 
 extern PotWindow* windowPointer;
 
@@ -40,7 +39,10 @@ void PotWindow::create(int width, int height, std::string title) {
 
 void PotWindow::onDraw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+	setViewPoint(viewPoint);
+
+	glRotatef(angle, 0, 1, 0);
+
 	if(target == 0){
 		drawPot();
 	} else{
@@ -56,7 +58,6 @@ void PotWindow::onDraw() {
 }
 
 void PotWindow::drawPot(){
-	setViewPoint(viewPoint);
 	glutSolidTeapot(1.0);
 }
 
@@ -113,8 +114,6 @@ void PotWindow::readFile(std::string fileName) {
 }
 
 void PotWindow::drawFile() {
-	setViewPoint(viewPoint);
-
 	for(auto it = face.begin(); it != face.end(); it++){
 		std::vector<int> item = *it;
 		glBegin(GL_TRIANGLES);
@@ -178,11 +177,7 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 const static float pi = 3.14159265358979323846;
 
 void PotWindow::spin(int id){
-	angle += ::pi/120;
-
-	viewPoint[0][0] = distance * sin(angle);
-	viewPoint[0][2] = distance * cos(angle);
-
+	angle += 5;
 	glutPostRedisplay();
 	if(spinning){
 		glutTimerFunc(40, spinWarpper, 1);

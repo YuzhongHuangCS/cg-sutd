@@ -48,8 +48,7 @@ class PotWindow : public glWindow {
 
 		std::string statusText;
 		bool spinning = false;
-		int distance = 5;
-		float angle = 0;
+		float angle = 5;
 };
 
 #endif // _POT_WINDOW_H_
