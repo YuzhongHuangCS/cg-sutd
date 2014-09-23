@@ -14,11 +14,12 @@ class PotWindow : public glWindow {
 		virtual void onKeyPress(unsigned char key, int x, int y);
 		virtual void onSpecialKeyPress(int key, int x, int y);
 
+		void spin(int id = 0);
+
 	protected:
 		void readFile(std::string fileName);
 		void drawPot();
 		void drawFile();
-		void spin(int id = 0);
 
 	private:
 		int target = 0;

@@ -3,8 +3,6 @@
 #include "PotWindow.h"
 #include <cmath>
 
-#define PI 3.14159265358979323846
-
 PotWindow::PotWindow(int argc, char** argv):
 	glWindow(argc, argv)
 {
@@ -132,10 +130,10 @@ void PotWindow::onKeyPress(unsigned char key, int x, int y) {
 			}
 			break;
 		case 's':
-			//spinning = !spinning;
-			//if(spinning){
-			spin();
-			//}
+			spinning = !spinning;
+			if(spinning){
+				spin();
+			}
 			break;
 	}
 
@@ -162,12 +160,21 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
+extern PotWindow* windowPointer;
+const static float pi = 3.14159265358979323846;
+
+void spinWarpper(int id) {
+	windowPointer->spin(id);
+}
+
 void PotWindow::spin(int id){
-	angle += PI/60;
+	angle += ::pi/120;
 
 	viewPoint[0][0] = distance * sin(angle);
 	viewPoint[0][2] = distance * cos(angle);
 
 	glutPostRedisplay();
-	//glutTimerFunc(100, this->spin, 1);
+	if(spinning){
+		glutTimerFunc(40, spinWarpper, 1);
+	}
 }
