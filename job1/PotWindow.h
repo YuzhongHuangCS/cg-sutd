@@ -20,14 +20,16 @@ class PotWindow : public glWindow {
 		void transColor(int id = 0);
 
 	protected:
+		void readDir();
 		void readFile(std::string fileName);
 		void compilePot();
 		void compileFile();
 
 	private:
 		int target = 0;
-		std::string objFileList[3] = {"garg.obj", "sphere.obj", "torus.obj"};
-
+		std::vector<std::string> objFileList;
+		std::vector<int> displayListMap = {-1};
+		
 		float viewPoint[3][3] = {
 			{0.0, 0.0, 5.0},
 			{0.0, 0.0, 0.0},
@@ -55,7 +57,6 @@ class PotWindow : public glWindow {
 		float angleX = 0;
 		float angleY = 0;
 
-		int displayListMap[4] = {-1, -1, -1, -1};
 		int transRange[2] = {0, 0};
 
 		int buttonID;

@@ -1,4 +1,5 @@
 #include <fstream>
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include "PotWindow.h"
 
@@ -16,6 +17,7 @@ void onMotionWrapper(int x, int y);
 PotWindow::PotWindow(int argc, char** argv):
 	glWindow(argc, argv)
 {
+	readDir();
 }
 
 PotWindow::~PotWindow() {
@@ -35,11 +37,11 @@ void PotWindow::create(int width, int height, std::string title) {
 	glutDisplayFunc(::onDrawWrapper);
 	glutReshapeFunc(::onReshapreWrapper);
 	glutKeyboardFunc(::onKeyPressWrapper);
-    glutSpecialFunc(::onSpecialKeyPressWrapper);
-    glutMouseFunc(::onClickWrapper);
-    glutMotionFunc(::onMotionWrapper);
+	glutSpecialFunc(::onSpecialKeyPressWrapper);
+	glutMouseFunc(::onClickWrapper);
+	glutMotionFunc(::onMotionWrapper);
 
-    glutMainLoop();
+	glutMainLoop();
 }
 
 void PotWindow::onDraw() {
@@ -161,7 +163,10 @@ void PotWindow::onKeyPress(unsigned char key, int x, int y) {
 			transColor(0);
 			break;
 		case 'l':
-			target = (target + 1) % 4;
+			/* note that displayListMap contain SolidTeapot's displaylist
+			   So it is one more than objFileList
+			 */
+			target = (target + 1) % displayListMap.size();
 			if((target != 0) && (displayListMap[target] == -1)){
 				readFile(objFileList[target-1]);
 			}
@@ -224,16 +229,16 @@ void PotWindow::transColor(int id) {
 void PotWindow::onClick(int button, int state, int x, int y){
 	buttonID = button;
 	buttonState = state;
-	if(state == 1){
-		if(buttonID == 0){
+	if(state == GLUT_UP){
+		if(buttonID == GLUT_LEFT_BUTTON){
 			angleXOffset = angleXOffset + float(y-buttonY) / 10;
 			angleYOffset = angleYOffset + float(x-buttonX) / 10;
 		}
-		if(buttonID == 1){
+		if(buttonID == GLUT_MIDDLE_BUTTON){
 			xOffset += float((buttonX-x)) / 100;
 			yOffset += float((y-buttonY)) / 100;
 		}
-		if(buttonID == 2){
+		if(buttonID == GLUT_RIGHT_BUTTON){
 			fOffset += float((buttonX-x) + (buttonY-y)) / 30;
 		}
 	}
@@ -242,25 +247,41 @@ void PotWindow::onClick(int button, int state, int x, int y){
 }
 
 void PotWindow::onMotion(int x, int y){
-	if(buttonID == 0){
-		// note that x and y used in screen and coordinate is different
+	if(buttonID == GLUT_LEFT_BUTTON){
+		// Note that x and y used in screen and coordinate is different
 		angleX = angleXOffset + float(y-buttonY) / 10;
 		angleY = angleYOffset + float(x-buttonX) / 10;
 		glutPostRedisplay();
 	}
-	if(buttonID == 1){
+	if(buttonID == GLUT_MIDDLE_BUTTON){
 		viewPoint[0][0] = xOffset + float((buttonX-x)) / 100;
 		viewPoint[1][0] = xOffset + float((buttonX-x)) / 100;
 		viewPoint[0][1] = yOffset + float((y-buttonY)) / 100;
 		viewPoint[1][1] = yOffset + float((y-buttonY)) / 100;
 		glutPostRedisplay();
 	}
-	if(buttonID == 2){
+	if(buttonID == GLUT_RIGHT_BUTTON){
 		fovy = fOffset + float((buttonX-x) + (buttonY-y)) / 30;
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		gluPerspective(fovy, 1.0, 1.0, 100.0);
 		glutPostRedisplay();
+	}
+}
+
+void PotWindow::readDir() {
+	boost::filesystem::path p(".");
+
+	try {
+		for(auto file = boost::filesystem::directory_iterator(p); file != boost::filesystem::directory_iterator(); ++file){
+			auto fileName = file->path().string();
+			if(fileName.find(".obj") != std::string::npos){
+				objFileList.push_back(fileName);
+				displayListMap.push_back(-1);
+			}
+		}
+	} catch(const boost::filesystem::filesystem_error & ex) {
+		std::cerr << ex.what() << std::endl;
 	}
 }
 

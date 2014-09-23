@@ -1,6 +1,6 @@
 CC			= g++
 CFLAGS		= -std=c++11 -Wall
-LINKFLAGS	= -lGL -lGLU -lglut
+LINKFLAGS	= -lGL -lGLU -lglut -lboost_system -lboost_filesystem
 SRCS		= main.cpp glWindow.cpp PotWindow.cpp
 OBJS		= $(SRCS:.cpp=.o)
 PROG		= main.out
