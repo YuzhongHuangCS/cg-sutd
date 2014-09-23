@@ -210,26 +210,26 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 }
 
 void PotWindow::spin(int id) {
-	angleY += 5;
+	angleY += spinSpeed;
 	glutPostRedisplay();
 	if(spinning){
-		glutTimerFunc(40, spinWrapper, 1);
+		glutTimerFunc(spinInterval, spinWrapper, 1);
 	}
 }
 
 void PotWindow::transColor(int id) {
 	float currentColor[4] = {
-		diffColors[transRange[0]][0] + (diffColors[transRange[1]][0] - diffColors[transRange[0]][0]) / 10 * id,
-		diffColors[transRange[0]][1] + (diffColors[transRange[1]][1] - diffColors[transRange[0]][1]) / 10 * id,
-		diffColors[transRange[0]][2] + (diffColors[transRange[1]][2] - diffColors[transRange[0]][2]) / 10 * id,
-		diffColors[transRange[0]][3] + (diffColors[transRange[1]][3] - diffColors[transRange[0]][3]) / 10 * id
+		diffColors[transRange[0]][0] + (diffColors[transRange[1]][0] - diffColors[transRange[0]][0]) / transSpeed * id,
+		diffColors[transRange[0]][1] + (diffColors[transRange[1]][1] - diffColors[transRange[0]][1]) / transSpeed * id,
+		diffColors[transRange[0]][2] + (diffColors[transRange[1]][2] - diffColors[transRange[0]][2]) / transSpeed * id,
+		diffColors[transRange[0]][3] + (diffColors[transRange[1]][3] - diffColors[transRange[0]][3]) / transSpeed * id
 	};
 
 	setMaterialDiffuse(currentColor);
 	glutPostRedisplay();
 	
-	if(id < 10){
-		glutTimerFunc(25, transColorWrapper, ++id);
+	if(id < transSpeed){
+		glutTimerFunc(transInterval, transColorWrapper, ++id);
 	}
 }
 

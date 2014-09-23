@@ -19,6 +19,10 @@ class PotWindow : public glWindow {
 		void spin(int id = 0);
 		void transColor(int id = 0);
 
+		const static int spinSpeed = 3;
+		const static int spinInterval = 25;
+		const static int transSpeed = 10;
+		const static int transInterval = 25;
 		const static int dollyRate = 30;
 		const static int trackRate = 150;
 		const static int tumbleRate = 10;
