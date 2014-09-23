@@ -2,7 +2,7 @@
 
 glWindow::glWindow(int argc, char** argv) {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);
 }
 
 glWindow::~glWindow() {
@@ -12,10 +12,11 @@ void glWindow::create(int width, int height, std::string title) {
 	glutInitWindowSize(width, height);
 	glutCreateWindow(title.c_str());
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE_ARB);
+	glEnable(GL_LIGHTING);
 }
 
 void glWindow::addLight(int index) {
-	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0 + index);
 }
 

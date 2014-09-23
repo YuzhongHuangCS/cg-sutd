@@ -99,32 +99,39 @@ void PotWindow::readFile(std::string fileName) {
 	while (std::getline(inFile, line)) {
 		if(line.find("v ") != std::string::npos){
 			boost::split(words, line, boost::is_any_of(" "));
-			nums.clear();
-			// index start from 1 to exclude first item
-			for(unsigned int i = 1; i < words.size(); i++) {
-				nums.push_back(std::stof(words[i]));
-			}
+			nums = {
+				std::stof(words[1]),
+				std::stof(words[2]),
+				std::stof(words[3])
+			};
 			vertex.push_back(nums);
 			continue;
 		}
 
 		if(line.find("vn ") != std::string::npos){
 			boost::split(words, line, boost::is_any_of(" "));
-			nums.clear();
-			for(unsigned int i = 1; i < words.size(); i++) {
-				nums.push_back(std::stof(words[i]));
-			}
+			nums = {
+				std::stof(words[1]),
+				std::stof(words[2]),
+				std::stof(words[3])
+			};
 			normal.push_back(nums);
 			continue;
 		}
 
 		if(line.find("f ") != std::string::npos){
 			boost::split(words, line, boost::is_any_of(" /"));
-			// adjust the offset of index here
-			intNums.clear();
-			for(unsigned int i = 1; i < words.size(); i++) {
-				intNums.push_back(std::stoi(words[i]) - 1);
-			}
+			/* adjust the offset of index here
+			 * since some parts are not necessary, handle it myself.
+			 */
+			intNums = {
+				std::stoi(words[1]) - 1,
+				std::stoi(words[3]) - 1,
+				std::stoi(words[4]) - 1,
+				std::stoi(words[6]) - 1,
+				std::stoi(words[7]) - 1,
+				std::stoi(words[9]) - 1
+			};
 			face.push_back(intNums);
 			continue;
 		}
@@ -138,12 +145,12 @@ void PotWindow::compileFile() {
 	for(auto it = face.begin(); it != face.end(); it++){
 		std::vector<int> item = *it;
 		glBegin(GL_TRIANGLES);
-			glNormal3f(normal[item[2]][0], normal[item[2]][1], normal[item[2]][2]);
+			glNormal3f(normal[item[1]][0], normal[item[1]][1], normal[item[1]][2]);
 			glVertex3f(vertex[item[0]][0], vertex[item[0]][1], vertex[item[0]][2]);
+			glNormal3f(normal[item[3]][0], normal[item[3]][1], normal[item[3]][2]);
+			glVertex3f(vertex[item[2]][0], vertex[item[2]][1], vertex[item[2]][2]);
 			glNormal3f(normal[item[5]][0], normal[item[5]][1], normal[item[5]][2]);
-			glVertex3f(vertex[item[3]][0], vertex[item[3]][1], vertex[item[3]][2]);
-			glNormal3f(normal[item[8]][0], normal[item[8]][1], normal[item[8]][2]);
-			glVertex3f(vertex[item[6]][0], vertex[item[6]][1], vertex[item[6]][2]);
+			glVertex3f(vertex[item[4]][0], vertex[item[4]][1], vertex[item[4]][2]);
 		glEnd();
 	}
 	
@@ -168,7 +175,7 @@ void PotWindow::onKeyPress(unsigned char key, int x, int y) {
 			 */
 			target = (target + 1) % displayListMap.size();
 			if((target != 0) && (displayListMap[target] == -1)){
-				readFile(objFileList[target-1]);
+				readFile(objFileList[target - 1]);
 			}
 			break;
 		case 's':
@@ -235,8 +242,8 @@ void PotWindow::onClick(int button, int state, int x, int y){
 			angleYOffset = angleYOffset + float(x-buttonX) / 10;
 		}
 		if(buttonID == GLUT_MIDDLE_BUTTON){
-			xOffset += float((buttonX-x)) / 100;
-			yOffset += float((y-buttonY)) / 100;
+			xOffset += float((buttonX-x)) / 150;
+			yOffset += float((y-buttonY)) / 150;
 		}
 		if(buttonID == GLUT_RIGHT_BUTTON){
 			fOffset += float((buttonX-x) + (buttonY-y)) / 30;
@@ -254,10 +261,10 @@ void PotWindow::onMotion(int x, int y){
 		glutPostRedisplay();
 	}
 	if(buttonID == GLUT_MIDDLE_BUTTON){
-		viewPoint[0][0] = xOffset + float((buttonX-x)) / 100;
-		viewPoint[1][0] = xOffset + float((buttonX-x)) / 100;
-		viewPoint[0][1] = yOffset + float((y-buttonY)) / 100;
-		viewPoint[1][1] = yOffset + float((y-buttonY)) / 100;
+		viewPoint[0][0] = xOffset + float((buttonX-x)) / 150;
+		viewPoint[1][0] = xOffset + float((buttonX-x)) / 150;
+		viewPoint[0][1] = yOffset + float((y-buttonY)) / 150;
+		viewPoint[1][1] = yOffset + float((y-buttonY)) / 150;
 		glutPostRedisplay();
 	}
 	if(buttonID == GLUT_RIGHT_BUTTON){
