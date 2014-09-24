@@ -52,10 +52,12 @@ void PotWindow::onDraw() {
 	glRotatef(angleX, 1, 0, 0);
 	glRotatef(angleY, 0, 1, 0);
 
-	if(target == 0){
-		statusText += "SolidTeapot";
-	} else{
-		statusText += objFileList[target - 1];
+	if(statusText.empty()){
+		if(target == 0){
+			statusText = "SolidTeapot";
+		} else{
+			statusText = objFileList[target - 1];
+		}
 	}
 	
 	if(displayListMap[target] == -1){
