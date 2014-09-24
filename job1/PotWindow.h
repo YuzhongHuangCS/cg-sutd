@@ -19,14 +19,6 @@ class PotWindow : public glWindow {
 		void spin(int id = 0);
 		void transColor(int id = 0);
 
-		const static int spinSpeed = 3;
-		const static int spinInterval = 25;
-		const static int transSpeed = 10;
-		const static int transInterval = 25;
-		const static int dollyRate = 30;
-		const static int trackRate = 150;
-		const static int tumbleRate = 10;
-
 	protected:
 		void readDir();
 		void readFile(std::string fileName);
@@ -77,6 +69,14 @@ class PotWindow : public glWindow {
 		float xOffset = viewPoint[0][0];
 		float yOffset = viewPoint[0][1];
 		float fOffset = fovy;
+
+		const static int spinSpeed = 3;
+		const static int spinInterval = 25;
+		const static int transCount = 10;
+		const static int transInterval = 25;
+		const static int dollyRate = 30;
+		const static int trackRate = 150;
+		const static int tumbleRate = 10;
 };
 
 #endif // _POT_WINDOW_H_

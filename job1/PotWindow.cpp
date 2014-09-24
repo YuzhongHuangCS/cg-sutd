@@ -181,7 +181,7 @@ void PotWindow::onKeyPress(unsigned char key, int x, int y) {
 		case 's':
 			spinning = !spinning;
 			if(spinning){
-				spin();
+				spin(0);
 			}
 			break;
 	}
@@ -211,25 +211,32 @@ void PotWindow::onSpecialKeyPress(int key, int x, int y) {
 
 void PotWindow::spin(int id) {
 	angleY += spinSpeed;
-	glutPostRedisplay();
+
 	if(spinning){
-		glutTimerFunc(spinInterval, spinWrapper, 1);
+		glutTimerFunc(spinInterval, spinWrapper, ++id);
+	}
+
+	if(id != 0){
+		glutPostRedisplay();
 	}
 }
 
 void PotWindow::transColor(int id) {
 	float currentColor[4] = {
-		diffColors[transRange[0]][0] + (diffColors[transRange[1]][0] - diffColors[transRange[0]][0]) / transSpeed * id,
-		diffColors[transRange[0]][1] + (diffColors[transRange[1]][1] - diffColors[transRange[0]][1]) / transSpeed * id,
-		diffColors[transRange[0]][2] + (diffColors[transRange[1]][2] - diffColors[transRange[0]][2]) / transSpeed * id,
-		diffColors[transRange[0]][3] + (diffColors[transRange[1]][3] - diffColors[transRange[0]][3]) / transSpeed * id
+		diffColors[transRange[0]][0] + (diffColors[transRange[1]][0] - diffColors[transRange[0]][0]) / transCount * id,
+		diffColors[transRange[0]][1] + (diffColors[transRange[1]][1] - diffColors[transRange[0]][1]) / transCount * id,
+		diffColors[transRange[0]][2] + (diffColors[transRange[1]][2] - diffColors[transRange[0]][2]) / transCount * id,
+		diffColors[transRange[0]][3] + (diffColors[transRange[1]][3] - diffColors[transRange[0]][3]) / transCount * id
 	};
 
 	setMaterialDiffuse(currentColor);
-	glutPostRedisplay();
-	
-	if(id < transSpeed){
+
+	if(id < transCount){
 		glutTimerFunc(transInterval, transColorWrapper, ++id);
+	}
+
+	if(id != 0){
+		glutPostRedisplay();
 	}
 }
 
@@ -237,16 +244,18 @@ void PotWindow::onClick(int button, int state, int x, int y){
 	buttonID = button;
 	buttonState = state;
 	if(state == GLUT_UP){
-		if(buttonID == GLUT_LEFT_BUTTON){
-			fOffset += float((buttonX-x) + (buttonY-y)) / dollyRate;
-		}
-		if(buttonID == GLUT_MIDDLE_BUTTON){
-			xOffset += float((buttonX-x)) / trackRate;
-			yOffset += float((y-buttonY)) / trackRate;
-		}
-		if(buttonID == GLUT_RIGHT_BUTTON){
-			angleXOffset = angleXOffset + float(y-buttonY) / tumbleRate;
-			angleYOffset = angleYOffset + float(x-buttonX) / tumbleRate;
+		switch(buttonID) {
+			case GLUT_LEFT_BUTTON:
+				fOffset += float((buttonX-x) + (buttonY-y)) / dollyRate;
+				break;
+			case GLUT_MIDDLE_BUTTON:
+				xOffset += float((buttonX-x)) / trackRate;
+				yOffset += float((y-buttonY)) / trackRate;
+				break;
+			case GLUT_RIGHT_BUTTON:
+				angleXOffset = angleXOffset + float(y-buttonY) / tumbleRate;
+				angleYOffset = angleYOffset + float(x-buttonX) / tumbleRate;
+				break;
 		}
 	}
 	buttonX = x;
@@ -254,27 +263,27 @@ void PotWindow::onClick(int button, int state, int x, int y){
 }
 
 void PotWindow::onMotion(int x, int y){
-	if(buttonID == GLUT_LEFT_BUTTON){
-		fovy = fOffset + float((buttonX-x) + (buttonY-y)) / dollyRate;
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(fovy, 1.0, 1.0, 100.0);
-		glutPostRedisplay();
-	}
-	if(buttonID == GLUT_MIDDLE_BUTTON){
-		viewPoint[0][0] = xOffset + float((buttonX-x)) / trackRate;
-		viewPoint[1][0] = xOffset + float((buttonX-x)) / trackRate;
-		viewPoint[0][1] = yOffset + float((y-buttonY)) / trackRate;
-		viewPoint[1][1] = yOffset + float((y-buttonY)) / trackRate;
-		glutPostRedisplay();
+	switch(buttonID) {
+		case GLUT_LEFT_BUTTON:
+			fovy = fOffset + float((buttonX-x) + (buttonY-y)) / dollyRate;
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			gluPerspective(fovy, 1.0, 1.0, 100.0);
+			break;
+		case GLUT_MIDDLE_BUTTON:
+			viewPoint[0][0] = xOffset + float((buttonX-x)) / trackRate;
+			viewPoint[1][0] = xOffset + float((buttonX-x)) / trackRate;
+			viewPoint[0][1] = yOffset + float((y-buttonY)) / trackRate;
+			viewPoint[1][1] = yOffset + float((y-buttonY)) / trackRate;
+			break;
+		case GLUT_RIGHT_BUTTON:
+			// Note that x and y used in screen and coordinate is different
+			angleX = angleXOffset + float(y-buttonY) / tumbleRate;
+			angleY = angleYOffset + float(x-buttonX) / tumbleRate;
+			break;
 	}
 
-	if(buttonID == GLUT_RIGHT_BUTTON){
-		// Note that x and y used in screen and coordinate is different
-		angleX = angleXOffset + float(y-buttonY) / tumbleRate;
-		angleY = angleYOffset + float(x-buttonX) / tumbleRate;
-		glutPostRedisplay();
-	}
+	glutPostRedisplay();
 }
 
 void PotWindow::readDir() {
