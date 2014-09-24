@@ -62,7 +62,13 @@ void glWindow::drawText(std::string text) {
 	glPushMatrix();
 	glLoadIdentity();
 
-	gluOrtho2D(0, width, 0, height);
+	if(width > height){
+		gluOrtho2D(0, width, (height - width) / 2, (height + width) / 2);
+	} else{
+		gluOrtho2D((width - height) / 2, (height + width) / 2, 0, width);
+		//gluOrtho2D(0, (width - height) / 2, height, (width + height) / 2);
+		//gluOrtho2D(0, 500, 0, 500);
+	}
 
 	glRasterPos2i(10, 10);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*) text.c_str());

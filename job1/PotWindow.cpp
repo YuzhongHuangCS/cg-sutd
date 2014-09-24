@@ -1,6 +1,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <exception>
 #include "PotWindow.h"
 
 extern PotWindow* windowPointer;
@@ -51,6 +52,12 @@ void PotWindow::onDraw() {
 	glRotatef(angleX, 1, 0, 0);
 	glRotatef(angleY, 0, 1, 0);
 
+	if(target == 0){
+		statusText += "SolidTeapot";
+	} else{
+		statusText += objFileList[target - 1];
+	}
+	
 	if(displayListMap[target] == -1){
 		if(target == 0){
 			compilePot();
@@ -96,46 +103,53 @@ void PotWindow::readFile(std::string fileName) {
 		return;
 	}
 
-	while (std::getline(inFile, line)) {
-		if(line.find("v ") != std::string::npos){
-			boost::split(words, line, boost::is_any_of(" "));
-			nums = {
-				std::stof(words[1]),
-				std::stof(words[2]),
-				std::stof(words[3])
-			};
-			vertex.push_back(nums);
-			continue;
-		}
+	try{
+		while (std::getline(inFile, line)) {
+			if(line.find("v ") != std::string::npos){
+				boost::split(words, line, boost::is_any_of(" "));
+				nums = {
+					std::stof(words[1]),
+					std::stof(words[2]),
+					std::stof(words[3])
+				};
+				vertex.push_back(nums);
+				continue;
+			}
 
-		if(line.find("vn ") != std::string::npos){
-			boost::split(words, line, boost::is_any_of(" "));
-			nums = {
-				std::stof(words[1]),
-				std::stof(words[2]),
-				std::stof(words[3])
-			};
-			normal.push_back(nums);
-			continue;
-		}
+			if(line.find("vn ") != std::string::npos){
+				boost::split(words, line, boost::is_any_of(" "));
+				nums = {
+					std::stof(words[1]),
+					std::stof(words[2]),
+					std::stof(words[3])
+				};
+				normal.push_back(nums);
+				continue;
+			}
 
-		if(line.find("f ") != std::string::npos){
-			boost::split(words, line, boost::is_any_of(" /"));
-			/* adjust the offset of index here
-			 * since some parts are not necessary, handle it myself.
-			 */
-			intNums = {
-				std::stoi(words[1]) - 1,
-				std::stoi(words[3]) - 1,
-				std::stoi(words[4]) - 1,
-				std::stoi(words[6]) - 1,
-				std::stoi(words[7]) - 1,
-				std::stoi(words[9]) - 1
-			};
-			face.push_back(intNums);
-			continue;
+			if(line.find("f ") != std::string::npos){
+				boost::split(words, line, boost::is_any_of(" /"));
+				/* adjust the offset of index here
+				 * since some parts are not necessary, handle it myself.
+				 */
+				intNums = {
+					std::stoi(words[1]) - 1,
+					std::stoi(words[3]) - 1,
+					std::stoi(words[4]) - 1,
+					std::stoi(words[6]) - 1,
+					std::stoi(words[7]) - 1,
+					std::stoi(words[9]) - 1
+				};
+				face.push_back(intNums);
+				continue;
+			}
 		}
+	} catch(std::exception ex) {
+		statusText = "Error while parse file: " + fileName;
+		std::cerr << statusText << std::endl;
+		return;
 	}
+
 }
 
 void PotWindow::compileFile() {
